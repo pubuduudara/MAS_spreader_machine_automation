@@ -20,6 +20,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 //variables
 int number_of_plies;
+int number_of_rolls;
 float layer_length;
 char text[10]; //for taking input as a string
 
@@ -58,6 +59,14 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
+  lcd.print("No of rolls:");
+  lcd.setCursor(0, 1);
+  getInputString('#', text);
+  sscanf(text, "%d", &number_of_rolls);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
   lcd.print("No of plies:");
   lcd.setCursor(0, 1);
   getInputString('#', text);
@@ -74,6 +83,9 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
   // End: Get user inputs
+
+  //Calculating Cycle time
+  float CT = (((247 + number_of_rolls*9 +number_of_rolls*70 + layer_length*number_of_plies*getSpeedPerMeter(layer_length) +120*number_of_rolls)/60*5/6));
 
   // Start measuring
   int last = 0;
@@ -315,4 +327,30 @@ void getInputString(char delimiter, char str[10]) {
     }
   }
   //Serial.println(str);
+}
+
+float getSpeedPerMeter(float len){
+  if((0<Length) && (Length<=1)){
+    return 10.625;
+  }else if((1 <Length) && (Length<=1.5)){
+    return 8.625
+  }else if((1.5 <Length) && (Length<=2)){
+    return 6.875;
+  }else if((2 <Length) && (Length<=2.5)){
+    return 5.6275;
+  }else if((2.5 <Length) && (Length<=3)){
+    return 4.9;
+  }else if((3 <Length) && (Length<=3.5)){
+    return 4.3;
+  }else if((3.5 <Length) && (Length<=4)){
+    return 3.8;
+  }else if((4 <Length) && (Length<=4.5)){
+    return 3.65;
+  }else if((4.5 <Length) && (Length<=5)){
+    return 3.55;
+  }else if((5 <Length) && (Length<=5.5)){
+    return 3.4;
+  }else{
+    return 3.25;
+  }
 }
