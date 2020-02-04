@@ -34,6 +34,31 @@ int dir_pin_1 = 32;
 int dir_pin_2 = 35;
 int dis_pin = 34;
 
+float t1 = millis();
+
+// Start measuring
+int last = 0;
+int count = 0;
+float distance = 0;
+int last_plies = 0;
+int lastA = 0;
+int dir = 1;
+
+bool is_half_ply = false;
+bool is_damage = false;
+bool is_roll_finished = false;
+
+// Variables to submit
+int plies = 0;
+int total_plies = 0;
+int roll_id = 0;
+int number_of_rolls_finished = 0;
+float total_damage_length = 0;
+float total_overlap_length = 0;
+float total_used_length = 0;
+bool on_track = false;
+
+
 void setup() {
 
   pinMode(dir_pin_1, INPUT);
@@ -67,6 +92,14 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
+  lcd.print("Roll id:");
+  lcd.setCursor(0, 1);
+  getInputString('#', text);
+  sscanf(text, "%d", &roll_id);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
   lcd.print("No of plies:");
   lcd.setCursor(0, 1);
   getInputString('#', text);
@@ -84,26 +117,54 @@ void loop() {
   lcd.setCursor(0, 0);
   // End: Get user inputs
 
-  //Calculating Cycle time
-  float CT = ((247 + number_of_rolls*9 +number_of_rolls*70 + layer_length*number_of_plies*getSpeedPerMeter(layer_length) +120*number_of_rolls)/60*5/6);
+  //Calculating Cycle time in seconds
+  float CT = (247 + number_of_rolls * 9 + number_of_rolls * 70 + layer_length * number_of_plies * getSpeedPerMeter(layer_length) + 120 * number_of_rolls) * 60 * 5 / 6;
+
+  uploadCycleTime(CT);
+
+  t1 = millis();
 
   // Start measuring
-  int last = 0;
-  int count = 0;
-  float distance = 0;
-  int plies = 0;
-  int lastA = 0;
-  int dir = 1;
-  bool is_half_ply = false;
-  bool is_damage = false;
-  bool is_roll_finished = false;
+  last = 0;
+  count = 0;
+  distance = 0;
+  plies = 0;
+  last_plies = 0;
+  lastA = 0;
+  dir = 1;
+  is_half_ply = false;
+  is_damage = false;
+  is_roll_finished = false;
 
   // Variables to submit
-  float total_damage_length = 0;
-  float total_overlap_length = 0;
-  float total_used_length = 0;
+  total_damage_length = 0;
+  total_overlap_length = 0;
+  total_used_length = 0;
+  on_track = false;
 
   while (true) {
+
+    //When number of plies changed, submit data to the server
+    if (last_plies != plies) {
+      //On track/Offtrack calculation
+      float req_time = plies * CT / number_of_plies;
+      float t2 = millis();
+
+      float curr_time = (t2 - t1) / 1000;
+
+      if (curr_time > req_time) {
+        //Off track
+        on_track = false;
+      } else {
+        //On track
+        on_track = true;
+      }
+      last_plies = plies;
+
+      uploadData();
+
+    }
+
 
     // Check user input
     char customKey = customKeypad.getKey();
@@ -134,41 +195,48 @@ void loop() {
 
     }
 
-    if (plies >= number_of_plies || is_roll_finished) {
+    if (is_roll_finished) {
+      number_of_rolls_finished++;
+      total_used_length += distance;
+      total_plies += plies;
+      //Submit data*****************************************
+      uploadData();
+      //****************************************************
+      is_roll_finished = false;
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+      lcd.print("Roll id:");
+      lcd.setCursor(0, 1);
+      getInputString('#', text);
+      sscanf(text, "%d", &roll_id);
+
+      //************************************************
+      uploadData();
+      //************************************************
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+      plies = 0;
+
+    }
+
+    if (plies >= number_of_plies) {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Done !");
       delay(1000);
-      lcd.setCursor(0, 1);
-      lcd.print("Submit? #");
-      lcd.setCursor(0, 0);
-      while (true) {
-        lcd.setCursor(0, 0);
-        lcd.print("Plies:");
-        lcd.print(plies);
-        char key = getInputChar();
-        if (key == 'D') {
-          plies--;
-        } else if (key == 'C') {
-          plies++;
-        } else if (key == '#') {
-
-          break;
-        }
-      }
-
       //Submit data*****************************************
-
+      uploadData();
       //****************************************************
-
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Submitted !");
-      delay(1000);
       lcd.clear();
       lcd.setCursor(0, 0);
       break;
     }
+
+
 
     if (!is_half_ply && !is_damage) {
       int a = digitalRead(dir_pin_1);
@@ -209,6 +277,7 @@ void loop() {
 
     // Calculations
     if (is_half_ply) {
+      lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Start overlap?");
       waitForInput('#');
@@ -254,17 +323,21 @@ void loop() {
       plies++;
       distance = 0;
       //*********************************************************
-      float overlap_length = dis_with_overlap - layer_length;
+      total_overlap_length += layer_length - dis_with_overlap;
+      //*********************************************************
 
       lcd.clear();
 
       is_half_ply = false;
 
     } else if (is_damage) {
-      
+      lcd.clear();
       total_damage_length += distance;
       distance = 0;
       lcd.setCursor(0, 0);
+      //**************************************************************
+      uploadData();
+      //**************************************************************
       lcd.print("Continue laying?");
       waitForInput('#');
       lcd.clear();
@@ -329,28 +402,53 @@ void getInputString(char delimiter, char str[10]) {
   //Serial.println(str);
 }
 
-float getSpeedPerMeter(float len){
-  if((0<Length) && (Length<=1)){
+float getSpeedPerMeter(float len) {
+  if ((0 < len) && (len <= 1)) {
     return 10.625;
-  }else if((1 <Length) && (Length<=1.5)){
-    return 8.625
-  }else if((1.5 <Length) && (Length<=2)){
+  } else if ((1 < len) && (len <= 1.5)) {
+    return 8.625;
+  } else if ((1.5 < len) && (len <= 2)) {
     return 6.875;
-  }else if((2 <Length) && (Length<=2.5)){
+  } else if ((2 < len) && (len <= 2.5)) {
     return 5.6275;
-  }else if((2.5 <Length) && (Length<=3)){
+  } else if ((2.5 < len) && (len <= 3)) {
     return 4.9;
-  }else if((3 <Length) && (Length<=3.5)){
+  } else if ((3 < len) && (len <= 3.5)) {
     return 4.3;
-  }else if((3.5 <Length) && (Length<=4)){
+  } else if ((3.5 < len) && (len <= 4)) {
     return 3.8;
-  }else if((4 <Length) && (Length<=4.5)){
+  } else if ((4 < len) && (len <= 4.5)) {
     return 3.65;
-  }else if((4.5 <Length) && (Length<=5)){
+  } else if ((4.5 < len) && (len <= 5)) {
     return 3.55;
-  }else if((5 <Length) && (Length<=5.5)){
+  } else if ((5 < len) && (len <= 5.5)) {
     return 3.4;
-  }else{
+  } else {
     return 3.25;
   }
+}
+
+void uploadCycleTime(float CT) {
+  Serial.printf("CT:%f\n", CT);
+}
+
+void uploadData() {
+
+  Serial.printf("roll_id:%d, layer_length:%f, number_of_plies:%d, plies:%d\n", roll_id, layer_length, number_of_plies, plies);
+  Serial.printf("total_plies:%d\n", total_plies);
+  Serial.printf("total_damage_length:%f\n", total_damage_length);
+  Serial.printf("total_overlap_length:%f\n", total_overlap_length);
+  Serial.printf("total_used_length:%f\n", total_used_length);
+  Serial.printf("on_track:%d\n\n", on_track);
+
+  // int number_of_plies;
+  // int plies;
+  // int total_plies;
+  // int roll_id;
+  // float layer_length;
+  // int number_of_plies;
+  // float total_damage_length;
+  // float total_overlap_length;
+  // float total_used_length;
+  // bool on_track = false;
 }
