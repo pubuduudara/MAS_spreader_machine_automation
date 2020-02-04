@@ -85,7 +85,7 @@ void loop() {
   // End: Get user inputs
 
   //Calculating Cycle time
-  float CT = (((247 + number_of_rolls*9 +number_of_rolls*70 + layer_length*number_of_plies*getSpeedPerMeter(layer_length) +120*number_of_rolls)/60*5/6));
+  float CT = ((247 + number_of_rolls*9 +number_of_rolls*70 + layer_length*number_of_plies*getSpeedPerMeter(layer_length) +120*number_of_rolls)/60*5/6);
 
   // Start measuring
   int last = 0;
