@@ -44,6 +44,10 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 
+
+}
+
+void loop() {
   // Get user inputs
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -62,7 +66,7 @@ void setup() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  lcd.print("Layer length(m):");
+  lcd.print("Layer length(cm):");
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%f", &layer_length);
@@ -98,8 +102,9 @@ void setup() {
         char key = getInputChar();
         if (key == 'D') {
           plies--;
-        }
-        if (key == '#') {
+        } else if (key == 'C') {
+          plies++;
+        } else if (key == '#') {
 
           break;
         }
@@ -108,13 +113,14 @@ void setup() {
       //Submit data*****************************************
 
       //****************************************************
-      
+
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Submitted !");
       delay(1000);
       lcd.clear();
       lcd.setCursor(0, 0);
+      break;
     }
 
     // Check user input
@@ -143,7 +149,7 @@ void setup() {
       if (now != last && dir == 1) { // Rotating
         count++;
         distance += pi * R / N;
-        if (distance >= layer_length * 100) {
+        if (distance >= layer_length) {
           plies++;
           distance = 0;
         }
@@ -267,10 +273,6 @@ void setup() {
   }
 }
 
-void loop() {
-
-}
-
 void waitForInput(char x) {
   while (1) {
     char customKey = customKeypad.getKey();
@@ -299,12 +301,22 @@ void getInputString(char delimiter, char str[10]) {
 
       break;
     }
-    if (customKey == '*') {
-      lcd.print('.');
-      str[i] = (char)customKey;
-      str[++i] = '\0';
+    if (customKey == 'D') {
+      if (i > 0) {
+        str[--i] = '\0';
+        lcd.setCursor(i, 1);
+        lcd.print(' ');
+        lcd.setCursor(i, 1);
+      }
 
-    } else if (customKey) {
+    }
+    //    else if (customKey == '*') {
+    //      lcd.print('.');
+    //      str[i] = (char)customKey;
+    //      str[++i] = '\0';
+    //
+    //    }
+    else if (customKey) {
       //Serial.println(customKey);
       lcd.print(customKey);
       str[i] = (char)customKey;
