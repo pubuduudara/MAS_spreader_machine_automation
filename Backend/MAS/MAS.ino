@@ -19,7 +19,7 @@ const int rs = 13, en = 14, d4 = 27, d5 = 26, d6 = 25, d7 = 33;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 //variables
-int number_of_layers;
+int number_of_plies;
 float layer_length;
 char text[10]; //for taking input as a string
 
@@ -54,7 +54,15 @@ void setup() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  lcd.print("Layer length:");
+  lcd.print("No of plies:");
+  lcd.setCursor(0, 1);
+  getInputString('#', text);
+  sscanf(text, "%d", &number_of_plies);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  lcd.print("Layer length(m):");
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%f", &layer_length);
@@ -75,6 +83,39 @@ void setup() {
 
   while (true) {
 
+    if (plies >= number_of_plies) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Done !");
+      delay(1000);
+      lcd.setCursor(0, 1);
+      lcd.print("Submit? #");
+      lcd.setCursor(0, 0);
+      while (true) {
+        lcd.setCursor(0, 0);
+        lcd.print("Plies:");
+        lcd.print(plies);
+        char key = getInputChar();
+        if (key == 'D') {
+          plies--;
+        }
+        if (key == '#') {
+
+          break;
+        }
+      }
+
+      //Submit data*****************************************
+
+      //****************************************************
+      
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Submitted !");
+      delay(1000);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+    }
 
     // Check user input
     char customKey = customKeypad.getKey();
@@ -127,7 +168,7 @@ void setup() {
       lcd.print("Start overlap?");
       waitForInput('#');
       lcd.clear();
-      
+
       float dis_with_overlap = 0;
       // Overlap
       while (1) {
