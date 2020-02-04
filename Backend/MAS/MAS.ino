@@ -84,6 +84,7 @@ void loop() {
   int dir = 1;
   bool is_half_ply = false;
   bool is_damage = false;
+  bool is_roll_finished = false;
 
   // Variables to submit
   float total_damage_length = 0;
@@ -92,7 +93,36 @@ void loop() {
 
   while (true) {
 
-    if (plies >= number_of_plies) {
+    // Check user input
+    char customKey = customKeypad.getKey();
+    if (customKey == 'A' && !is_half_ply) {
+      //half ply
+      is_half_ply = true;
+
+    } else if (customKey == 'B' && !is_damage) {
+      //Damage
+      is_damage = true;
+
+    } else if (customKey == 'C') {
+      //Roll finished
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Roll finished?");
+      while (1) {
+        char key = getInputChar();
+        if (key == '#') { //continue
+          is_roll_finished = true;
+          break;
+        } else if (key == '*') { //cancel
+          is_roll_finished = false;
+          lcd.clear();
+          break;
+        }
+      }
+
+    }
+
+    if (plies >= number_of_plies || is_roll_finished) {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Done !");
@@ -126,52 +156,6 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
       break;
-    }
-
-    // Check user input
-    char customKey = customKeypad.getKey();
-    if (customKey == 'A' && !is_half_ply) {
-      //half ply
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Half ply?");
-      while (1) {
-        char key = getInputChar();
-        if (key == '#') { //continue
-          is_half_ply = true;
-        } else if (key == '*') { //cancel
-          is_half_ply = false;
-        }
-      }
-      
-    } else if (customKey == 'B' && !is_damage) {
-      //Damage
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Damage?");
-      while (1) {
-        char key = getInputChar();
-        if (key == '#') { //continue
-          is_damage = true;
-        } else if (key == '*') { //cancel
-          is_damage = false;
-        }
-      }
-      
-    } else if (customKey == 'C') {
-      //Roll finished
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Roll finished?");
-      while (1) {
-        char key = getInputChar();
-        if (key == '#') { //continue
-          is_roll_finished = true;
-        } else if (key == '*') { //cancel
-          is_roll_finished = false;
-        }
-      }
-
     }
 
     if (!is_half_ply && !is_damage) {
@@ -265,51 +249,14 @@ void loop() {
       is_half_ply = false;
 
     } else if (is_damage) {
+      
+      total_damage_length += distance;
+      distance = 0;
       lcd.setCursor(0, 0);
-      lcd.print("Start damage?");
+      lcd.print("Continue laying?");
       waitForInput('#');
       lcd.clear();
-      float damage_distance = 0;
-      // Overlap
-      while (1) {
-        int a = digitalRead(dir_pin_1);
-        int b = digitalRead(dir_pin_2);
-        int now = digitalRead(dis_pin);
-
-        // Direction
-        if (a != lastA) { //When first signal changes
-          if (b == a) { //If second signal has already changed
-            dir = 1; // Forward direction
-          } else {
-            dir = -1; // Backward direction
-          }
-          lastA = a;
-        }
-        // Distance
-        if (now != last && dir == 1) { // Rotating
-          count++;
-          damage_distance += pi * R / N;
-          last = now;
-        }
-
-        lcd.setCursor(0, 0);
-        lcd.printf("Damage L:");
-        lcd.print(damage_distance);
-        lcd.printf("cm");
-        lcd.setCursor(0, 1);
-        lcd.printf("Hold # if done");
-
-        char key = customKeypad.getKey();
-        if (key == '#') {
-          break;
-        }
-      }
-      //*********************************************************
-
-      lcd.clear();
       is_damage = false;
-      is_half_ply = true;
-
     }
 
 
