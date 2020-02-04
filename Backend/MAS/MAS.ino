@@ -85,6 +85,11 @@ void loop() {
   bool is_half_ply = false;
   bool is_damage = false;
 
+  // Variables to submit
+  float total_damage_length = 0;
+  float total_overlap_length = 0;
+  float total_used_length = 0;
+
   while (true) {
 
     if (plies >= number_of_plies) {
@@ -125,10 +130,48 @@ void loop() {
 
     // Check user input
     char customKey = customKeypad.getKey();
-    if (customKey == 'A' && !is_half_ply) { // Half ply
-      is_half_ply = true;
+    if (customKey == 'A' && !is_half_ply) {
+      //half ply
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Half ply?");
+      while (1) {
+        char key = getInputChar();
+        if (key == '#') { //continue
+          is_half_ply = true;
+        } else if (key == '*') { //cancel
+          is_half_ply = false;
+        }
+      }
+      
     } else if (customKey == 'B' && !is_damage) {
-      is_damage = true;
+      //Damage
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Damage?");
+      while (1) {
+        char key = getInputChar();
+        if (key == '#') { //continue
+          is_damage = true;
+        } else if (key == '*') { //cancel
+          is_damage = false;
+        }
+      }
+      
+    } else if (customKey == 'C') {
+      //Roll finished
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Roll finished?");
+      while (1) {
+        char key = getInputChar();
+        if (key == '#') { //continue
+          is_roll_finished = true;
+        } else if (key == '*') { //cancel
+          is_roll_finished = false;
+        }
+      }
+
     }
 
     if (!is_half_ply && !is_damage) {
