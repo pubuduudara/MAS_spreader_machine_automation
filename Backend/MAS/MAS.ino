@@ -1,5 +1,18 @@
 #include <Keypad.h>
 #include <LiquidCrystal.h>
+#include <WiFi.h>
+#include <FirebaseESP32.h>
+
+#define FIREBASE_HOST "https://masdemo-146c2.firebaseio.com/" //Do not include https:// in FIREBASE_HOST
+#define FIREBASE_AUTH "8ppozIBTOCqqRdKMJluxljP5Aw5EhPeKljCOBzKb"
+
+#define WIFI_SSID "Eng-Student"
+#define WIFI_PASSWORD "3nG5tuDt"
+
+//Define FirebaseESP32 data object
+FirebaseData firebaseData;
+FirebaseJson json;
+
 
 //Keypad
 const byte ROWS = 4;
@@ -40,30 +53,31 @@ int dir = 1;
 
 //variables
 char text[10]; //for taking input as a string
-int number_of_plies, plies = 0, total_plies = 0;
+int number_of_plies, plies = 0;
 int number_of_rolls, roll_id = 0, rolls = 0;
 int tkt_len = 0;
 
 float layer_length;
-float total_damage_length = 0;
-float total_overlap_length = 0;
-float total_used_length = 0;
+float damage_length = 0;
+float overlap_length = 0;
+float used_length = 0;
+float end_length = 0;
 
 bool is_half_ply = false;
 bool is_damage = false;
 bool is_roll_finished = false;
-bool on_track = false;
+bool is_on_track = false;
 bool is_new_roll = true;
+bool is_end = false;
 bool status_running = false;
 
 void setup() {
+  Serial.begin(115200);
+  wifi_connect();
 
   pinMode(dir_pin_1, INPUT);
   pinMode(dir_pin_2, INPUT);
   pinMode(dis_pin, INPUT);
-
-
-  Serial.begin(115200);
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 
@@ -85,6 +99,10 @@ void loop() {
   getInputString('#', text);
   sscanf(text, "%f", &layer_length);
 
+  //******************************************************
+  user_input_layer_length(layer_length);
+  //******************************************************
+
   lcd.clear();
   lcd.setCursor(0, 0);
 
@@ -92,6 +110,10 @@ void loop() {
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%d", &number_of_plies);
+
+  //******************************************************
+  user_input_no_of_plies(number_of_plies);
+  //******************************************************
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -101,6 +123,10 @@ void loop() {
   getInputString('#', text);
   sscanf(text, "%d", &number_of_rolls);
 
+  //******************************************************
+  user_input_no_of_rolls(number_of_rolls);
+  //******************************************************
+
   lcd.clear();
   lcd.setCursor(0, 0);
 
@@ -109,7 +135,9 @@ void loop() {
   //Calculating Cycle time in seconds
   float CT = (247 + number_of_rolls * 9 + number_of_rolls * 70 + layer_length * number_of_plies * getSpeedPerMeter(layer_length) + 120 * number_of_rolls) * 60 * 5 / 6;
 
-  uploadCycleTime(CT);
+  //******************************************************
+  upload_cycle_time(CT);
+  //******************************************************
 
   t1 = millis();
 
@@ -121,15 +149,20 @@ void loop() {
   last_plies = 0;
   lastA = 0;
   dir = 1;
+
   is_half_ply = false;
   is_damage = false;
   is_roll_finished = false;
+  is_end = false;
+  is_new_roll = false;
+  is_on_track = false;
+  status_running = false;
 
   // Variables to submit
-  total_damage_length = 0;
-  total_overlap_length = 0;
-  total_used_length = 0;
-  on_track = false;
+  damage_length = 0;
+  overlap_length = 0;
+  used_length = 0;
+  end_length = 0;
 
   while (true) {
 
@@ -145,10 +178,10 @@ void loop() {
 
       if (curr_time > req_time) {
         //Off track
-        on_track = false;
+        is_on_track = false;
       } else {
         //On track
-        on_track = true;
+        is_on_track = true;
       }
       last_plies = plies;
 
@@ -188,19 +221,57 @@ void loop() {
       //End
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print("Roll finished?");
+      lcd.print("End?");
+      while (1) {
+        char key = getInputChar();
+        if (key == '#') { //continue
+          is_end = true;
+          break;
+        } else if (key == '*') { //cancel
+          is_end = false;
+          lcd.clear();
+          break;
+        }
+      }
     }
 
     if (is_roll_finished) {
       rolls++;
-      total_used_length += distance;
-      total_plies += plies;
+      used_length = distance;
+
       //Submit data*****************************************
-      uploadData();
+      update_used_length(used_length);
       //****************************************************
+      
       is_roll_finished = false;
       is_new_roll = true;
 
+      plies = 0;
+
+    }
+
+    if (is_end) {
+      rolls++;
+
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+      lcd.print("End length(cm):");
+      lcd.setCursor(0, 1);
+      getInputString('#', text);
+      sscanf(text, "%f", &end_length);
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+
+      //Submit data*****************************************
+      update_end_length(end_length);
+      //****************************************************
+
+      is_new_roll = true;
+      is_end = false;
       plies = 0;
 
     }
@@ -223,8 +294,10 @@ void loop() {
       sscanf(text, "%d", &tkt_len);
 
       is_new_roll = false;
+      
       //************************************************
-      uploadData();
+      create_new_roll(roll_id);
+      update_tktlen(tkt_len);
       //************************************************
 
       lcd.clear();
@@ -236,14 +309,15 @@ void loop() {
       lcd.setCursor(0, 0);
       lcd.print("Done !");
       delay(1000);
+      
       //Submit data*****************************************
-      uploadData();
+      //uploadData();
       //****************************************************
+      
       lcd.clear();
       lcd.setCursor(0, 0);
       break;
     }
-
 
 
     if (!is_half_ply && !is_damage) {
@@ -331,25 +405,27 @@ void loop() {
         }
       }
 
-      distance += dis_with_overlap;
-      plies++;
-      distance = 0;
       //*********************************************************
-      total_overlap_length += layer_length - dis_with_overlap;
+      overlap_length = distance + dis_with_overlap - layer_length;
+      update_overlap_length(overlap_length);
       //*********************************************************
 
+      plies++;
+      distance = 0;
       lcd.clear();
 
       is_half_ply = false;
 
     } else if (is_damage) {
       lcd.clear();
-      total_damage_length += distance;
+      damage_length = distance;
       distance = 0;
       lcd.setCursor(0, 0);
+      
       //**************************************************************
-      uploadData();
+      update_damage_length(damage_length);
       //**************************************************************
+      
       lcd.print("Continue laying?");
       waitForInput('#');
       lcd.clear();
@@ -444,23 +520,87 @@ void uploadCycleTime(float CT) {
   Serial.printf("CT:%f\n", CT);
 }
 
-void uploadData() {
+void wifi_connect() {
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
 
-  Serial.printf("roll_id:%d, layer_length:%f, number_of_plies:%d, plies:%d\n", roll_id, layer_length, number_of_plies, plies);
-  Serial.printf("total_plies:%d\n", total_plies);
-  Serial.printf("total_damage_length:%f\n", total_damage_length);
-  Serial.printf("total_overlap_length:%f\n", total_overlap_length);
-  Serial.printf("total_used_length:%f\n", total_used_length);
-  Serial.printf("on_track:%d\n\n", on_track);
-
-  // int number_of_plies;
-  // int plies;
-  // int total_plies;
-  // int roll_id;
-  // float layer_length;
-  // int number_of_plies;
-  // float total_damage_length;
-  // float total_overlap_length;
-  // float total_used_length;
-  // bool on_track = false;
+  //Set database read timeout to 1 minute (max 15 minutes)
+  Firebase.setReadTimeout(firebaseData, 1000 * 60);
+  //tiny, small, medium, large and unlimited.
+  //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
+  Firebase.setwriteSizeLimit(firebaseData, "tiny");
+  create_new_batch();
 }
+
+//##############################
+String data_base = "MAS";
+int total_plies_count = 0;
+//int roll_id = 0;
+int batch_number = 0;
+void create_new_batch() {
+  batch_number += 1;
+  //roll_id = 0;
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number), 0);
+}
+
+void user_input_no_of_plies(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_plies", value);
+}
+
+void user_input_layer_length(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_layer_length", value);
+}
+
+void user_input_number_of_rolls(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_rolls", value);
+}
+
+void update_total_plies() {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/updated_total_plies", total_plies_count);
+}
+
+void create_new_roll(int roll_id) {
+  //roll_id+=1;
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id), 0);
+}
+
+void update_tktlen(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/tktlen", value);
+}
+
+void update_plies(int roll_id, int value) {
+  total_plies_count += value;
+  update_total_plies();
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/plies", value);
+}
+
+void update_total_damage_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_damage_length", value);
+}
+
+void update_total_overlapped_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_overlapped_length", value);
+}
+
+void update_total_used_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/update_total_used_length", value);
+}
+
+void update_ends(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/ends", value);
+}
+
+void update_on_track(int roll_id, bool stat) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/on_track", stat);
+}
+//######################################
