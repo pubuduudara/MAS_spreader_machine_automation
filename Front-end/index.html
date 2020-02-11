@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Mas Data Set</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="brand"><span>Mas</span> Data Set</h1>
+    <div class="wrapper">
+
+
+      <div class="company-info">
+    <!--     <h3>Mas Data Set</h3>
+        <ul>
+          <li><i class="fa fa-road"></i> The road map</li>
+          <li><i class="fa fa-phone"></i> For more info: (555) 555-5555</li>
+          <li><i class="fa fa-envelope"></i> test@mas.mas</li>
+          <br>
+          <h3>Follow the guide lines mentioned below</h3>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod, nostrum sed dicta sunt porro totam aspernatur numquam animi! Expedita dolorum itaque quisquam dolorem maxime, at debitis voluptate omnis odit ipsam.
+          </p>
+            
+        </ul>-->
+      </div> 
+    
+
+      <div class="contact">
+        <h3>Laying Details</h3>
+        <div class="alert">Your message has been sent</div>
+
+        <div class="container">
+
+          <div class="row">
+            <div class="col">
+
+              <div class="text-center topic">Batch</div>
+              <span class="info text-center" id="batchVal"></span>
+              
+            </div>
+            <div class="col-5">
+
+              <div class="text-center topic">Roll Id</div>
+              <span class="info text-center" id="rollId"></span>
+
+            </div>
+            <div class="col">
+              
+              <div class="text-center topic">Tktlen</div>
+              <span class="info text-center" id="tktlenVal"></span>
+
+            </div>
+
+            <div class="col">
+              
+              <div class="text-center topic">On track</div>
+              <span class="info text-center" id="ontrackVal"></span>
+
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="row">
+            <div class="col">
+              
+              <div class="text-center topic">Total plies</div>
+              <span class="info text-center" id="totalPliesVal"></span>
+
+            </div>
+            <div class="col-5">
+              
+              <div class="text-center topic">Total Damage length</div>
+              <span class="info text-center" id="damageVal"></span>
+
+            </div>
+            <div class="col">
+              <div class="text-center topic">Total overlap length</div>
+              <span class="info text-center" id="overlapVal"></span>
+            </div>
+
+            <div class="col">
+              <div class="text-center topic">Layer length</div>
+              <span class="info text-center" id="layerlenVal"></span>
+            </div>
+
+          </div>
+
+          <hr>
+          
+          <div class="row">
+            <div class="col">
+              <div class="text-center topic">Total Used length</div>
+              <span class="info text-center" id="usedVal"></span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="text-center topic">Comment:</div>
+              <span class="info text-center" id="comment"></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- <section id="finalOutput">
+          <p id="plies">
+            <label>Batch</label>
+            
+            <span class="info" id="batchVal"></span>
+          </p>
+          <p>
+            <label>Width</label>
+            <span class="info" id="widthVal"></span>
+          </p>
+          <p>
+            <label>Tktlen</label>
+            <span class="info" id="tktlenVal"></span>
+          </p>
+          <p>
+            <label>Total plies</label>
+            <span class="info" id="totalPliesVal"></span>
+          </p>
+          <p>
+            <label>Total Damage length</label>
+            <span class="info" id="damageVal"></span>
+          </p>
+          <p >
+            <label>Total overlap length</label>
+            <span class="info" id="overlapVal"></span>
+          </p>
+          <p >
+            <label>Total Used length</label>
+            <span class="info" id="usedVal"></span>
+          </p>
+          
+        </section> -->
+      </div>
+    </div>
+  </div>
+
+  
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-database.js"></script>
+
+
+  <!-- <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script> -->
+  <script src="read.js"></script>
+</body>
+</html>
