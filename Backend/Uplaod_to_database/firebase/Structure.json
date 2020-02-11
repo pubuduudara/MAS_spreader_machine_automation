@@ -1,0 +1,28 @@
+"batch"{
+	"number of plies"
+	
+	"layer length"
+	
+	"number of rolls"
+	
+	"total_plies"
+	
+	"roll id"{
+		
+		"tktlen"
+		
+		"plies"
+		
+		"total_damage_length"
+		
+		"total_overlap_length"
+		
+		"total_used_length"
+		
+		"ends"
+		
+		"on_track"
+	}
+	
+	
+}

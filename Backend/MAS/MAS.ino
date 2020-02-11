@@ -1,7 +1,19 @@
 #include <Keypad.h>
 #include <LiquidCrystal.h>
+#include <WiFi.h>
+#include <FirebaseESP32.h>
 
-//Keypad
+#define FIREBASE_HOST "https://masdemo-146c2.firebaseio.com/" //Do not include https:// in FIREBASE_HOST
+#define FIREBASE_AUTH "8ppozIBTOCqqRdKMJluxljP5Aw5EhPeKljCOBzKb"
+
+#define WIFI_SSID "Eng-Student"
+#define WIFI_PASSWORD "3nG5tuDt"
+
+//Define FirebaseESP32 data object
+FirebaseData firebaseData;
+FirebaseJson json;
+
+///Keypad
 const byte ROWS = 4;
 const byte COLS = 4;
 char hexaKeys[ROWS][COLS] = {
@@ -59,16 +71,100 @@ float total_used_length = 0;
 bool on_track = false;
 
 
+void wifi_connect() {
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+
+  //Set database read timeout to 1 minute (max 15 minutes)
+  Firebase.setReadTimeout(firebaseData, 1000 * 60);
+  //tiny, small, medium, large and unlimited.
+  //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
+  Firebase.setwriteSizeLimit(firebaseData, "tiny");
+  create_new_batch();
+}
+//##############################
+String data_base = "MAS";
+int total_plies_count = 0;
+//int roll_id = 0;
+int batch_number = 0;
+void create_new_batch() {
+  batch_number += 1;
+  //roll_id = 0;
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number), 0);
+}
+
+void user_input_no_of_plies(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_plies", value);
+}
+
+void user_input_layer_length(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_layer_length", value);
+}
+
+void user_input_number_of_rolls(int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_rolls", value);
+}
+
+void update_total_plies() {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/updated_total_plies", total_plies);
+}
+
+void create_new_roll(int roll_id) {
+  //roll_id+=1;
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id), 0);
+}
+
+void update_tktlen(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/tktlen", value);
+}
+
+void update_plies(int roll_id,int value) {
+  total_plies_count += value;
+  update_total_plies();
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/plies", value);
+}
+
+void update_total_damage_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_damage_length", value);
+}
+
+void update_total_overlapped_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_overlapped_length", value);
+}
+
+void update_total_used_length(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/update_total_used_length", value);
+}
+
+void update_ends(int roll_id, int value) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/ends", value);
+}
+
+void update_on_track(int roll_id, bool stat) {
+  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/on_track", stat);
+}
+//######################################
+
 void setup() {
+  Serial.begin(115200);
+  wifi_connect();
 
   pinMode(dir_pin_1, INPUT);
   pinMode(dir_pin_2, INPUT);
   pinMode(dis_pin, INPUT);
-
-
-  Serial.begin(115200);
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
+
 
 
 }
@@ -88,7 +184,7 @@ void loop() {
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%d", &number_of_rolls);
-
+  user_input_number_of_rolls(number_of_rolls);
   lcd.clear();
   lcd.setCursor(0, 0);
 
@@ -96,7 +192,7 @@ void loop() {
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%d", &roll_id);
-
+  create_new_roll(roll_id);
   lcd.clear();
   lcd.setCursor(0, 0);
 
@@ -104,7 +200,7 @@ void loop() {
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%d", &number_of_plies);
-
+  user_input_no_of_plies(number_of_plies);
   lcd.clear();
   lcd.setCursor(0, 0);
 
@@ -112,7 +208,7 @@ void loop() {
   lcd.setCursor(0, 1);
   getInputString('#', text);
   sscanf(text, "%f", &layer_length);
-
+  user_input_layer_length(layer_length);
   lcd.clear();
   lcd.setCursor(0, 0);
   // End: Get user inputs
@@ -171,6 +267,7 @@ void loop() {
     if (customKey == 'A' && !is_half_ply) {
       //half ply
       is_half_ply = true;
+      
 
     } else if (customKey == 'B' && !is_damage) {
       //Damage
@@ -441,6 +538,13 @@ void uploadData() {
   Serial.printf("total_used_length:%f\n", total_used_length);
   Serial.printf("on_track:%d\n\n", on_track);
 
+  update_total_damage_length(roll_id, total_damage_length);
+  
+  update_total_overlapped_length(roll_id, total_overlap_length);
+  
+  update_total_used_length(roll_id, total_used_length);
+  update_on_track(roll_id, on_track);
+  update_plies(roll_id,plies);
   // int number_of_plies;
   // int plies;
   // int total_plies;
