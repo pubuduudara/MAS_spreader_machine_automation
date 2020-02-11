@@ -18,11 +18,6 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 const int rs = 13, en = 14, d4 = 27, d5 = 26, d6 = 25, d7 = 33;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-//variables
-int number_of_plies;
-int number_of_rolls;
-float layer_length;
-char text[10]; //for taking input as a string
 
 //constants
 float pi = 3.14;
@@ -36,7 +31,6 @@ int dis_pin = 34;
 
 float t1 = millis();
 
-// Start measuring
 int last = 0;
 int count = 0;
 float distance = 0;
@@ -44,20 +38,23 @@ int last_plies = 0;
 int lastA = 0;
 int dir = 1;
 
-bool is_half_ply = false;
-bool is_damage = false;
-bool is_roll_finished = false;
+//variables
+char text[10]; //for taking input as a string
+int number_of_plies, plies = 0, total_plies = 0;
+int number_of_rolls, roll_id = 0, rolls = 0;
+int tkt_len = 0;
 
-// Variables to submit
-int plies = 0;
-int total_plies = 0;
-int roll_id = 0;
-int number_of_rolls_finished = 0;
+float layer_length;
 float total_damage_length = 0;
 float total_overlap_length = 0;
 float total_used_length = 0;
-bool on_track = false;
 
+bool is_half_ply = false;
+bool is_damage = false;
+bool is_roll_finished = false;
+bool on_track = false;
+bool is_new_roll = true;
+bool status_running = false;
 
 void setup() {
 
@@ -69,7 +66,6 @@ void setup() {
   Serial.begin(115200);
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
-
 
 }
 
@@ -84,18 +80,10 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  lcd.print("No of rolls:");
+  lcd.print("Lay length(cm):");
   lcd.setCursor(0, 1);
   getInputString('#', text);
-  sscanf(text, "%d", &number_of_rolls);
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  lcd.print("Roll id:");
-  lcd.setCursor(0, 1);
-  getInputString('#', text);
-  sscanf(text, "%d", &roll_id);
+  sscanf(text, "%f", &layer_length);
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -108,13 +96,14 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  lcd.print("Layer length(cm):");
+  lcd.print("No of rolls:");
   lcd.setCursor(0, 1);
   getInputString('#', text);
-  sscanf(text, "%f", &layer_length);
+  sscanf(text, "%d", &number_of_rolls);
 
   lcd.clear();
   lcd.setCursor(0, 0);
+
   // End: Get user inputs
 
   //Calculating Cycle time in seconds
@@ -143,6 +132,8 @@ void loop() {
   on_track = false;
 
   while (true) {
+
+
 
     //When number of plies changed, submit data to the server
     if (last_plies != plies) {
@@ -193,17 +184,28 @@ void loop() {
         }
       }
 
+    } else if (customKey == 'D') {
+      //End
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Roll finished?");
     }
 
     if (is_roll_finished) {
-      number_of_rolls_finished++;
+      rolls++;
       total_used_length += distance;
       total_plies += plies;
       //Submit data*****************************************
       uploadData();
       //****************************************************
       is_roll_finished = false;
+      is_new_roll = true;
 
+      plies = 0;
+
+    }
+
+    if (is_new_roll) {
       lcd.clear();
       lcd.setCursor(0, 0);
 
@@ -212,15 +214,21 @@ void loop() {
       getInputString('#', text);
       sscanf(text, "%d", &roll_id);
 
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+      lcd.print("Tktlen(cm):");
+      lcd.setCursor(0, 1);
+      getInputString('#', text);
+      sscanf(text, "%d", &tkt_len);
+
+      is_new_roll = false;
       //************************************************
       uploadData();
       //************************************************
 
       lcd.clear();
       lcd.setCursor(0, 0);
-
-      plies = 0;
-
     }
 
     if (plies >= number_of_plies) {
@@ -254,6 +262,10 @@ void loop() {
       }
       // Distance
       if (now != last && dir == 1) { // Rotating
+        if (!status_running) {
+          status_running = true;
+
+        }
         count++;
         distance += pi * R / N;
         if (distance >= layer_length) {
