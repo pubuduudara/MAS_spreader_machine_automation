@@ -242,7 +242,7 @@ void loop() {
       //Submit data*****************************************
       update_used_length(used_length);
       //****************************************************
-      
+
       is_roll_finished = false;
       is_new_roll = true;
 
@@ -265,9 +265,11 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
 
+      float comnt = tkt_len - (no_of_plies * lay_length) + overlap_length + damage_length + used_length + end_length;
 
       //Submit data*****************************************
       update_end_length(end_length);
+      update_comnt(comnt);
       //****************************************************
 
       is_new_roll = true;
@@ -294,7 +296,7 @@ void loop() {
       sscanf(text, "%d", &tkt_len);
 
       is_new_roll = false;
-      
+
       //************************************************
       create_new_roll(roll_id);
       update_tktlen(tkt_len);
@@ -309,11 +311,11 @@ void loop() {
       lcd.setCursor(0, 0);
       lcd.print("Done !");
       delay(1000);
-      
+
       //Submit data*****************************************
       //uploadData();
       //****************************************************
-      
+
       lcd.clear();
       lcd.setCursor(0, 0);
       break;
@@ -421,11 +423,11 @@ void loop() {
       damage_length = distance;
       distance = 0;
       lcd.setCursor(0, 0);
-      
+
       //**************************************************************
       update_damage_length(damage_length);
       //**************************************************************
-      
+
       lcd.print("Continue laying?");
       waitForInput('#');
       lcd.clear();
