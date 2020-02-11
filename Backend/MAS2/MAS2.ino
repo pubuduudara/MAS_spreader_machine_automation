@@ -185,7 +185,10 @@ void loop() {
       }
       last_plies = plies;
 
-      uploadData();
+      //******************************************************
+      update_plies(plies);
+      update_on_track(is_on_track);
+      //******************************************************
 
     }
 
@@ -265,7 +268,7 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
 
-      float comnt = tkt_len - (no_of_plies * lay_length) + overlap_length + damage_length + used_length + end_length;
+      float comment = tkt_len - (no_of_plies * lay_length) + overlap_length + damage_length + used_length + end_length;
 
       //Submit data*****************************************
       update_end_length(end_length);
