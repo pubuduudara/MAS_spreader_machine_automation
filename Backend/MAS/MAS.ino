@@ -1,17 +1,6 @@
-#include <Keypad.h>
-#include <LiquidCrystal.h>
-#include <WiFi.h>
-#include <FirebaseESP32.h>
+#include "functions.h"
 
-#define FIREBASE_HOST "https://masdemo-146c2.firebaseio.com/" //Do not include https:// in FIREBASE_HOST
-#define FIREBASE_AUTH "8ppozIBTOCqqRdKMJluxljP5Aw5EhPeKljCOBzKb"
 
-#define WIFI_SSID "Eng-Student"
-#define WIFI_PASSWORD "3nG5tuDt"
-
-//Define FirebaseESP32 data object
-FirebaseData firebaseData;
-FirebaseJson json;
 
 
 //Keypad
@@ -67,7 +56,7 @@ bool is_half_ply = false;
 bool is_damage = false;
 bool is_roll_finished = false;
 bool is_on_track = false;
-bool is_new_roll = true;
+bool is_new_roll = false;
 bool is_end = false;
 bool status_running = false;
 
@@ -130,6 +119,29 @@ void loop() {
   lcd.clear();
   lcd.setCursor(0, 0);
 
+  lcd.print("Roll id:");
+  lcd.setCursor(0, 1);
+  getInputString('#', text);
+  sscanf(text, "%d", &roll_id);
+
+  //************************************************
+  create_new_roll(roll_id);
+  //************************************************
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  lcd.print("Tktlen(cm):");
+  lcd.setCursor(0, 1);
+  getInputString('#', text);
+  sscanf(text, "%d", &tkt_len);
+
+  //************************************************
+  update_tktlen(roll_id, tkt_len);
+  //************************************************
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
   // End: Get user inputs
 
   //Calculating Cycle time in seconds
@@ -185,10 +197,13 @@ void loop() {
       }
       last_plies = plies;
 
+
+
       //******************************************************
-      update_plies(plies);
+      update_plies(roll_id, plies);
       update_on_track(is_on_track);
       //******************************************************
+
 
     }
 
@@ -243,7 +258,7 @@ void loop() {
       used_length = distance;
 
       //Submit data*****************************************
-      update_used_length(used_length);
+      update_used_length(roll_id, used_length);
       //****************************************************
 
       is_roll_finished = false;
@@ -268,11 +283,11 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
 
-      float comment = tkt_len - (no_of_plies * lay_length) + overlap_length + damage_length + used_length + end_length;
+      float comnt = tkt_len - (plies * layer_length) + overlap_length + damage_length + used_length + end_length;
 
       //Submit data*****************************************
-      update_end_length(end_length);
-      update_comnt(comnt);
+      update_end_length(roll_id, end_length);
+      update_comment(roll_id, comnt);
       //****************************************************
 
       is_new_roll = true;
@@ -280,6 +295,8 @@ void loop() {
       plies = 0;
 
     }
+
+
 
     if (is_new_roll) {
       lcd.clear();
@@ -302,7 +319,7 @@ void loop() {
 
       //************************************************
       create_new_roll(roll_id);
-      update_tktlen(tkt_len);
+      update_tktlen(roll_id, tkt_len);
       //************************************************
 
       lcd.clear();
@@ -412,7 +429,7 @@ void loop() {
 
       //*********************************************************
       overlap_length = distance + dis_with_overlap - layer_length;
-      update_overlap_length(overlap_length);
+      update_overlap_length(roll_id, overlap_length);
       //*********************************************************
 
       plies++;
@@ -428,7 +445,7 @@ void loop() {
       lcd.setCursor(0, 0);
 
       //**************************************************************
-      update_damage_length(damage_length);
+      update_damage_length(roll_id, damage_length);
       //**************************************************************
 
       lcd.print("Continue laying?");
@@ -546,66 +563,3 @@ void wifi_connect() {
   Firebase.setwriteSizeLimit(firebaseData, "tiny");
   create_new_batch();
 }
-
-//##############################
-String data_base = "MAS";
-int total_plies_count = 0;
-//int roll_id = 0;
-int batch_number = 0;
-void create_new_batch() {
-  batch_number += 1;
-  //roll_id = 0;
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number), 0);
-}
-
-void user_input_no_of_plies(int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_plies", value);
-}
-
-void user_input_layer_length(int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_layer_length", value);
-}
-
-void user_input_number_of_rolls(int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/user_input_number_of_rolls", value);
-}
-
-void update_total_plies() {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/updated_total_plies", total_plies_count);
-}
-
-void create_new_roll(int roll_id) {
-  //roll_id+=1;
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id), 0);
-}
-
-void update_tktlen(int roll_id, int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/tktlen", value);
-}
-
-void update_plies(int roll_id, int value) {
-  total_plies_count += value;
-  update_total_plies();
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/plies", value);
-}
-
-void update_total_damage_length(int roll_id, int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_damage_length", value);
-}
-
-void update_total_overlapped_length(int roll_id, int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/total_overlapped_length", value);
-}
-
-void update_total_used_length(int roll_id, int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/update_total_used_length", value);
-}
-
-void update_ends(int roll_id, int value) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/ends", value);
-}
-
-void update_on_track(int roll_id, bool stat) {
-  Firebase.setDouble(firebaseData, data_base + "/" + String(batch_number) + "/" + String(roll_id) + "/on_track", stat);
-}
-//######################################
