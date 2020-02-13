@@ -10,209 +10,146 @@ var firebaseConfig = {
   measurementId: "G-XKDMFRXJBF"
 };
 // Initialize Firebase
+/////////////////////////////////////////////////
 firebase.initializeApp(firebaseConfig);
-// firebase.analytics();
-
-// var batchRef = firebase.database().ref('MAS/1/');
-// var rollidRef = firebase.database().ref('MAS/1/');
-// var tktlenRef = firebase.database().ref('MAS/1/'+ {rollId});
-
-// var tdamageRef = firebase.database().ref('MAS/1/'+{rollId});
-// // var tpliesRef = firebase.database().ref('MAS/1/'+ {rollId});
-// var tusedRef = firebase.database().ref('MAS/1/'+ {rollid});
-
-
-
-
-// var comment = firebase.database().ref('messages/cccc/a2');
-
 
 // Retreaving data from firebase
 /////////////////////////////////////////////////
-
-// batchRef.on('value', gotData2);
-// function gotData2(data) {
-  // var scores = data.val();
-  // document.getElementById("batchVal").innerHTML = 1;
-// }
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-document.getElementById("batchVal").innerHTML = 1;
-
+// document.getElementById("batchVal").innerHTML = 1;
 var rollidRef = firebase.database().ref('MAS/1');
 
 rollidRef.on('value', gotData1);
-
-
 function gotData1(data) {
   var mainNodes = data.val();
   var keys = Object.keys(mainNodes);
   var values = Object.values(mainNodes);
 
-  console.log("the values are "+values);
-
-  console.log("the mainNodes are "+mainNodes);
-  console.log("the keys are "+keys);
-
-  for(var i=0;i<keys.length-4; i++){
+  for(var i=0;i<keys.length-7; i++){
     var k = keys[i];
     var v = values[i];
-    console.log(k);
-    console.log(v);
-    //  var a = parseInt(k);
-    //  console.log("a = "+typeof(a));
 
-    // var onTrack = Object.values(mainNodes[k].on_track);
-    var onTrack = v.on_track;
-     console.log("on track: "+onTrack)
-    var plies = v.plies;
-    //  console.log(plies)
-    var total_dam_len = mainNodes[k].total_damage_length;
-    //  console.log("dam len= "+ total_dam_len)
-    var total_overlapped_len = mainNodes[k].total_overlapped_length;
-    var update_total_used_len = mainNodes[k].update_total_used_length;
+    var dam_len = mainNodes[k].damage_length;
+    if(dam_len == null) dam_len = 0.00;
     
+    var overlapped_len = mainNodes[k].overlap_length;
+    if(overlapped_len == null) overlapped_len = 0.00;
+  
+    var plies = mainNodes[k].plies;
+    if(plies == null) plies = 0;
+
+    var update_total_used_len = mainNodes[k].update_total_used_length;
+    if(update_total_used_len == null) update_total_used_len = 0.00;
+
+    var comment = mainNodes[k].comment;
+    if(comment == null) comment = 0.00;
+
+    var end_len = mainNodes[k].end_length;
+    if(end_len == null) end_len = 0.00;
+    
+    // var dam_len = mainNodes[k].damage_length;
+    // var overlapped_len = mainNodes[k].overlap_length;
+    // var plies = mainNodes[k].plies;
+    // var tktlen = mainNodes[k].tktlen;
+    // var update_total_used_len = mainNodes[k].update_total_used_length;
+    // var comment = mainNodes[k].comment;
+    // var end_len = mainNodes[k].end_length;
+
     document.getElementById("rollId").innerHTML = k;
-    document.getElementById("ontrackVal").innerHTML = onTrack;
-    document.getElementById("totalPliesVal").innerHTML = plies;
-    document.getElementById("damageVal").innerHTML = total_dam_len;
-    document.getElementById("overlapVal").innerHTML = total_overlapped_len;
+    document.getElementById("commentVal").innerHTML = comment;
+    document.getElementById("pliesVal").innerHTML = plies;
+    document.getElementById("damageVal").innerHTML = dam_len;
+    document.getElementById("overlapVal").innerHTML = overlapped_len;
     document.getElementById("usedVal").innerHTML = update_total_used_len;
+    // document.getElementById("tktlenVal").innerHTML = tktlen_;
+    document.getElementById("endlenVal").innerHTML = end_len;
+  }
+}
+// The following are the common parameters
+// ///////////////////////////////////////////////////////
+
+// var batch_damage_lenRef = firebase.database().ref('MAS/1/batch_damage_length');
+// var batch_end_lenRef = firebase.database().ref('MAS/1/batch_end_length');
+// var batch_overlap_lenRef = firebase.database().ref('MAS/1/batch_overlap_length');
+var batch_total_pliesRef = firebase.database().ref('MAS/1/batch_total_plies');
+
+// var batch_used_lenRef = firebase.database().ref('MAS/1/batch_used_length');
+var ontrackRef = firebase.database().ref('MAS/1/on_track');
+var user_input_layer_lenRef = firebase.database().ref('MAS/1/user_input_layer_length');
+var user_input_rollsRef = firebase.database().ref('MAS/1/user_input_no_of_rolls');
+var user_input_pliesRef = firebase.database().ref('MAS/1/user_input_number_of_plies');
+
+
+// damage
+// batch_damage_lenRef.on('value', gotData2);
+//  function gotData2(data) {
+//    var damageLen = data.val();
+//    console.log(damageLen);
+//    document.getElementById("batch_damage_lenId").innerHTML = damageLen;
+//  }
+
+// Layer len
+// batch_end_lenRef.on('value', gotData3);
+//  function gotData3(data) {
+//    var layerlen = data.val();
+//    document.getElementById("batch_end_lenId").innerHTML = layerlen;
+//  }
+
+// Total overlap length
+// batch_overlap_lenRef.on('value', gotData4);
+//  function gotData4(data) {
+//    var t_overLap = data.val();
+//    document.getElementById("batch_overlap_lenId").innerHTML = t_overLap;
+//  }
+
+// Total plies
+batch_total_pliesRef.on('value', gotData5);
+function gotData5(data) {
+  var t_plies = data.val();
+  document.getElementById("batch_total_pliesId").innerHTML = t_plies;
+}
+
+// Total used length
+// batch_used_lenRef.on('value', gotData6);
+// function gotData6(data) {
+//   var t_used = data.val();
+//   document.getElementById("batch_used_lenId").innerHTML = t_used;
+// }
+
+// Total overlap length
+ontrackRef.on('value', gotData7);
+function gotData7(data) {
+  var isOntrack = data.val();
+  
+  // console.log(isOntrack);
+  console.log(isOntrack);
+
+  if(isOntrack == 1){
+    document.getElementById("ontrackId_true").style.display = "block";
+    document.getElementById("ontrackId_false").style.display = "none";
+  }else{
+    document.getElementById("ontrackId_true").style.display = "none";
+    document.getElementById("ontrackId_false").style.display = "block";
   }
 }
 
+// input layer length
+user_input_layer_lenRef.on('value', gotData8);
+function gotData8(data) {
+  var inputLayerLen = data.val();
+  document.getElementById("user_input_layer_lenId").innerHTML = inputLayerLen;
+}
 
+// Input roll number
+user_input_rollsRef.on('value', gotData9);
+function gotData9(data) {
+  var inputRolls = data.val();
+  document.getElementById("user_input_rollsId").innerHTML = inputRolls;
+}
 
- var tktlenRef = firebase.database().ref('MAS/1/tktlen');
- var tpliesRef = firebase.database().ref('MAS/1/updated_total_plies');
- var layerLen = firebase.database().ref('MAS/1/user_input_layer_length');
- var toverlapRef = firebase.database().ref('MAS/1/user_input_number)of_plies');
- var endRef = firebase.database().ref('MAS/1/user_input_number_of_rolls');
-
- var tusedRef = firebase.database().ref('MAS/1/user_input_number_of_rolls');
-var tdamageRef = firebase.database().ref('MAS/1/user_input_number_of_rolls');
-
-// // tktlen
-// var tktlen = 0;
-// tktlenRef.on('value', gotData);
-// function gotData(data) {
-//   var tktlen = data.val();
-//   document.getElementById("tktlenVal").innerHTML = tktlen;
-// }
-
-
-// total plies
- tpliesRef.on('value', gotData);
- function gotData(data) {
-   var plies = data.val();
-   document.getElementById("totalPliesVal").innerHTML = plies;
- }
-
-// Layer len
- layerLen.on('value', gotData);
- function gotData(data) {
-   var layerlen = data.val();
-   document.getElementById("layerlenVal").innerHTML = layerlen;
- }
-
-// Total overlap length
- toverlapRef.on('value', gotData);
- function gotData(data) {
-   var t_overLap = data.val();
-   document.getElementById("overlapVal").innerHTML = t_overLap;
- }
-
-//  
-//  endRef.on('value', gotData);
-//  function gotData(data) {
-//    var mainNodes = data.val();
-//    document.getElementById("ontrackVal").innerHTML = scores;
-//  }
-
- 
- 
-
-let comment_cal = ( totalPliesVal,layerLen,used,damage,overlap,ends) => {
-  ((totalPliesVal*layerLen)+used+damage+overlap+ends)
- }
- 
- let comment = 0;
- comment = comment_cal(tktlenRef, tpliesRef, layerLen, tusedRef, tdamageRef, toverlapRef, endRef);
- 
- document.getElementById("comment").innerHTML = comment;
-
-/**
- *  var batchRef = firebase.database().ref('messages/aaaa/a1');
-    var rollidRef = firebase.database().ref('messages/bbbb/aa1');
-    var tktlenRef = firebase.database().ref('messages/bbbb/aa2');
-    var tpliesRef = firebase.database().ref('messages/cccc/a1');
-    var layerLen = firebase.database().ref('messages/cccc/a1');
-    var tdamageRef = firebase.database().ref('messages/cccc/a2');
-    var toverlapRef = firebase.database().ref('messages/cccc/a2');
-    var tusedRef = firebase.database().ref('messages/cccc/a2');
-    var endRef = firebase.database().ref('messages/cccc/a2');
- */
-
-
-
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-
-
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-
-// tktlenRef.on('value', gotData3);
-
-// function gotData3(data) {
-  // var scores = data.val();
-  // console.log(data.val());
-  
-// }
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-
-// tpliesRef.on('value', gotData4); //add err at last as arg
-
-// function gotData4(data) {
-  // var scores = data.val();
-  
-// }
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-
-// tdamageRef.on('value', gotData5);
-
-// function gotData5(data) {
-  // var scores = data.val();
-  
-// }
-
-
-// Retreaving data from firebase
-/////////////////////////////////////////////////
-
-// toverlapRef.on('value', gotData6);
-
-// function gotData6(data) {
-//   // var scores = data.val();
-  
-// }
-
-
-// // Retreaving data from firebase
-// /////////////////////////////////////////////////
-
-// tusedRef.on('value', gotData7);
-
-// function gotData7(data) {
-//   // var scores = data.val();
-  
-// }
-
+// input Plies
+user_input_pliesRef.on('value', gotData10);
+function gotData10(data) {
+  var inputPlies = data.val();
+  document.getElementById("user_input_pliesId").innerHTML = inputPlies;
+}
 

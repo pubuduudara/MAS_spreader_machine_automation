@@ -53,10 +53,10 @@ ul{
 
 .info {
   display: block;
-
-  /* background-color: #a3eede; */
-  width: 30%;
-  height: 20px;
+  /* padding-left: 2rem; */
+  background-color: #a3eede;
+  /* width: 30%; */
+  height: 25px;
   text-align: center;
 }
 
