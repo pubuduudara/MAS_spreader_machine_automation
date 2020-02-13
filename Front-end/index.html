@@ -1,122 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Mas Data Set</title>
-  
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="./bower_components/materialize/dist/css/materialize.min.css"  media="screen,projection"/>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css" />
+      <link rel="stylesheet" href="frontStyle.css">
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
 
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-  <div class="container">
-    <h1 class="brand"><span>Mas</span> Data Set</h1>
-    <div class="wrapper">
-
-      <div class="contact">
-        <h3>Laying Details</h3>
-        <div class="alert">Your message has been sent</div>
-
-        <div class="container">
-
-          <div class="row">
-            <div class="col">
-
-              <div class="text-left topic">Batch</div>
-              <span class="info text-left" id="batchVal"></span>
-              
+    <body>
+        <nav class="cyan lighten-1" role="navigation">
+            <div class="nav-wrapper container sizeit">
+              <img src="./img/logo3.png" alt="Mas logo">
+              <a id="logo-container" href="#" class="brand-logo" style="padding-left: 30px;"> <span style="color: darkred;">Spreader Machine Automation</span> Details</a>
+             
             </div>
-            <div class="col-5">
+        </nav>
+ 
+          <!-- User Inputs -->
+<!-- ///////////////////////////////////////////////////////////////////////////////////// -->
 
-              <div class="text-left topic">Roll Id</div>
-              <span class="info text-left" id="rollId"></span>
+    <h4 class="teal lighten-3" style="padding-left: 20px;">User inputs:</h4>
 
-            </div>
-            <div class="col">
-              
-              <div class="text-left topic">Comment</div>
-              <span class="info text-left" id="commentVal"></span>
+        <div class="row common">
+          <span class="col s4">
+            <label><h5>Layer Length: </h5></label>
+            <div class="info" id="user_input_layer_lenId"></div>
+          </span>
 
-            </div>
+          <span class="col s4">
+            <label><h5>Plies: </h5></label>
+            <div class="info" id="user_input_pliesId"></div>
+          </span>
 
-            <div class="col">
-              
-              <div class="text-left topic">Plies</div>
-              <span class="info text-left" id="pliesVal"></span>
+          <span class="col s4">
+            <label><h5>Rolls: </h5></label>
+            <div class="info" id="user_input_rollsId"></div>
+          </span>
+        </div>
 
-            </div>
-          </div>
+<!-- /////////////////////////////////////////////////////////////////////// -->
 
-          <hr>
+        <div class="teal lighten-3">
+          <h4 style="padding-left: 20px;">The Roll Parameters:  
+            <span style="float: right; padding-right: 20%; color: darkolivegreen;">The roll Id: 
+              <span id="rollId">
+              </span> 
+            </span>
+          </h4>
+        </div>
 
-          <div class="row">
-            <div class="col">
-              
-              <div class="text-left topic">Damage</div>
-              <span class="info text-left" id="damageVal"></span>
+        <!-- where the roll_ID parameters are displays -->
 
-            </div>
-            <div class="col-5">
-              
-              <div class="text-left topic">Overlap length</div>
-              <span class="info text-left" id="overlapVal"></span>
+        <div class="row common">
+          <span class="col s4">
+            <label><h5>Plies: </h5></label>
+            <div class="info" id="pliesVal"></div>
+          </span>
 
-            </div>
-            <div class="col">
-              <div class="text-left topic">Overlap length</div>
-              <span class="info text-left" id="overlapVal"></span>
-            </div>
+          <span class="col s4">
+            <label><h5>Overlaps: </h5></label>
+            <div class="info" id="overlapVal"></div>
+          </span>
 
-            <div class="col">
-              <div class="text-left topic">Tktlen</div>
-              <span class="info text-left" id="tktlenVal"></span>
-            </div>
+          <span class="col s4">
+            <label><h5>Damaged: </h5></label>
+            <div class="info" id="damageVal"></div>
+          </span>
+         
+        </div>
+        
+        <div class="row common">
 
-            <div class="col">
-              <div class="text-left topic">End length</div>
-              <span class="info text-left" id="end_len"></span>
-            </div>
+          <span class="col s4">
+            <label><h5>Used: </h5></label>
+            <div class="info" id="usedVal"></div>
+          </span>
 
-          </div>
+          <span class="col s4">
+            <label><h5>Ends: </h5></label>
+            <div class="info" id="endlenVal"></div>
+          </span>
 
-          <hr>
+          <span class="col s4">
+            <label><h5>Def/Ex: </h5></label>
+            <div class="info" id="commentVal"></div>
+          </span>
+
+        </div>
+
+        <h4 class="teal lighten-3"style="padding-left: 20px;">The Common Parameters:</h4>
+<!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- where the common parameters are displays -->
+    <!-- /////////////////////////////////////////// -->
+
+    <div class="row common">
+        <!-- <div class="col s3"> -->
+          <span class="col s6">
+            <label><h5>Plies Layed: </h5></label>
+            <div class="info" id="batch_total_pliesId"></div>
+          </span>
           
-          <div class="row">
-            <div class="col">
-              <div class="text-left topic">Total Used length</div>
-              <span class="info text-left" id="usedVal"></span>
+          <span class="col s6">
+            <label><h5>Ontrack status: </h5></label>
+            
+            <div id="ontrackId_true" style="display: none;">
+              <a class="button btn-large green pulse">
+                ON TRACK
+              </a>
             </div>
-          </div>
 
-          <div class="row">
-            <div class="col">
-              <div class="text-left topic">Comment:</div>
-              <span class="info text-left" id="comment"></span>
+            <div id="ontrackId_false" style="display:block;">
+              <a class="button btn-large red">
+                OFF TRACK
+              </a>
             </div>
-          </div>
-        </div><!--     -->
-
-
-      </div>
+          </span>
     </div>
-  </div>
+            
+<!-- /////////////////////////////////////////////////////////////// -->
 
-    
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script> -->
+      <!--JavaScript at end of body for optimized loading-->
+      <script type="text/javascript" src="./bower_components/materialize/dist/js/materialize.min.js"></script>
+        
+      <!-- The core Firebase JS SDK is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
 
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-      https://firebase.google.com/docs/web/setup#available-libraries -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-database.js"></script> -->
+      <!-- TODO: Add SDKs for Firebase products that you want to use
+          https://firebase.google.com/docs/web/setup#available-libraries -->
+      <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-database.js"></script>
 
-    <!-- <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script> -->
-  <script src="read.js"></script>
-</body>
-</html>
+        <!-- <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script> -->
+        <script src="read.js"></script>
+    </body>
+  </html>
+        
