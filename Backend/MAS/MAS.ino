@@ -1,8 +1,5 @@
 #include "functions.h"
 
-
-
-
 //Keypad
 const byte ROWS = 4;
 const byte COLS = 4;
@@ -25,6 +22,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 float pi = 3.14;
 int N = 24;
 float R = 4.1; //in cm
+float tolerance = 5; //Layer_length tolerance of the plies count 
 
 // Declare encoder pins
 int dir_pin_1 = 32;
@@ -43,8 +41,8 @@ int dir = 1;
 //variables
 char text[10]; //for taking input as a string
 int number_of_plies, plies = 0;
-int number_of_rolls, roll_id = 0, rolls = 0;
-int tkt_len = 0;
+int number_of_rolls = 5, roll_id = 1, rolls = 0;
+int tkt_len = 8500; //in cm
 
 float layer_length;
 float damage_length = 0;
@@ -54,7 +52,7 @@ float end_length = 0;
 
 bool is_half_ply = false;
 bool is_damage = false;
-bool is_roll_finished = false;
+bool is_used = false;
 bool is_on_track = false;
 bool is_new_roll = false;
 bool is_end = false;
@@ -104,37 +102,37 @@ void loop() {
   user_input_no_of_plies(number_of_plies);
   //******************************************************
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
+//  lcd.clear();
+//  lcd.setCursor(0, 0);
 
-  lcd.print("No of rolls:");
-  lcd.setCursor(0, 1);
-  getInputString('#', text);
-  sscanf(text, "%d", &number_of_rolls);
+//  lcd.print("No of rolls:");
+//  lcd.setCursor(0, 1);
+//  getInputString('#', text);
+//  sscanf(text, "%d", &number_of_rolls);
 
   //******************************************************
   user_input_no_of_rolls(number_of_rolls);
   //******************************************************
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  lcd.print("Roll id:");
-  lcd.setCursor(0, 1);
-  getInputString('#', text);
-  sscanf(text, "%d", &roll_id);
+//  lcd.clear();
+//  lcd.setCursor(0, 0);
+//
+//  lcd.print("Roll id:");
+//  lcd.setCursor(0, 1);
+//  getInputString('#', text);
+//  sscanf(text, "%d", &roll_id);
 
   //************************************************
   create_new_roll(roll_id);
   //************************************************
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-
-  lcd.print("Tktlen(cm):");
-  lcd.setCursor(0, 1);
-  getInputString('#', text);
-  sscanf(text, "%d", &tkt_len);
+//  lcd.clear();
+//  lcd.setCursor(0, 0);
+//
+//  lcd.print("Tktlen(cm):");
+//  lcd.setCursor(0, 1);
+//  getInputString('#', text);
+//  sscanf(text, "%d", &tkt_len);
 
   //************************************************
   update_tktlen(roll_id, tkt_len);
@@ -164,7 +162,7 @@ void loop() {
 
   is_half_ply = false;
   is_damage = false;
-  is_roll_finished = false;
+  is_used = false;
   is_end = false;
   is_new_roll = false;
   is_on_track = false;
@@ -226,10 +224,10 @@ void loop() {
       while (1) {
         char key = getInputChar();
         if (key == '#') { //continue
-          is_roll_finished = true;
+          is_used = true;
           break;
         } else if (key == '*') { //cancel
-          is_roll_finished = false;
+          is_used = false;
           lcd.clear();
           break;
         }
@@ -253,15 +251,18 @@ void loop() {
       }
     }
 
-    if (is_roll_finished) {
+    if (is_used) {
       rolls++;
       used_length = distance;
 
+      float comnt = tkt_len - (plies * layer_length) + overlap_length + damage_length + used_length + 0;
+
       //Submit data*****************************************
       update_used_length(roll_id, used_length);
+      update_comment(roll_id, comnt);
       //****************************************************
 
-      is_roll_finished = false;
+      is_used = false;
       is_new_roll = true;
 
       plies = 0;
@@ -270,7 +271,6 @@ void loop() {
 
     if (is_end) {
       rolls++;
-
 
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -283,7 +283,7 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
 
-      float comnt = tkt_len - (plies * layer_length) + overlap_length + damage_length + used_length + end_length;
+      float comnt = tkt_len - (plies * layer_length) + overlap_length + damage_length + 0 + end_length;
 
       //Submit data*****************************************
       update_end_length(roll_id, end_length);
@@ -299,21 +299,23 @@ void loop() {
 
 
     if (is_new_roll) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
+//      lcd.clear();
+//      lcd.setCursor(0, 0);
+//
+//      lcd.print("Roll id:");
+//      lcd.setCursor(0, 1);
+//      getInputString('#', text);
+//      sscanf(text, "%d", &roll_id);
 
-      lcd.print("Roll id:");
-      lcd.setCursor(0, 1);
-      getInputString('#', text);
-      sscanf(text, "%d", &roll_id);
+      roll_id++;
 
-      lcd.clear();
-      lcd.setCursor(0, 0);
-
-      lcd.print("Tktlen(cm):");
-      lcd.setCursor(0, 1);
-      getInputString('#', text);
-      sscanf(text, "%d", &tkt_len);
+//      lcd.clear();
+//      lcd.setCursor(0, 0);
+//
+//      lcd.print("Tktlen(cm):");
+//      lcd.setCursor(0, 1);
+//      getInputString('#', text);
+//      sscanf(text, "%d", &tkt_len);
 
       is_new_roll = false;
 
@@ -364,7 +366,7 @@ void loop() {
         }
         count++;
         distance += pi * R / N;
-        if (distance >= layer_length) {
+        if (distance >= layer_length-layer_length*tolerance) {
           plies++;
           distance = 0;
         }
