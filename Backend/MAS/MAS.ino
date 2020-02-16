@@ -22,7 +22,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 float pi = 3.14;
 int N = 24;
 float R = 4.1; //in cm
-float tolerance = 5; //Layer_length tolerance of the plies count 
+float tolerance = 5; //Layer_length tolerance of the plies count
 
 // Declare encoder pins
 int dir_pin_1 = 32;
@@ -56,7 +56,6 @@ bool is_used = false;
 bool is_on_track = false;
 bool is_new_roll = false;
 bool is_end = false;
-bool status_running = false;
 
 void setup() {
   Serial.begin(115200);
@@ -102,37 +101,37 @@ void loop() {
   user_input_no_of_plies(number_of_plies);
   //******************************************************
 
-//  lcd.clear();
-//  lcd.setCursor(0, 0);
+  //  lcd.clear();
+  //  lcd.setCursor(0, 0);
 
-//  lcd.print("No of rolls:");
-//  lcd.setCursor(0, 1);
-//  getInputString('#', text);
-//  sscanf(text, "%d", &number_of_rolls);
+  //  lcd.print("No of rolls:");
+  //  lcd.setCursor(0, 1);
+  //  getInputString('#', text);
+  //  sscanf(text, "%d", &number_of_rolls);
 
   //******************************************************
   user_input_no_of_rolls(number_of_rolls);
   //******************************************************
 
-//  lcd.clear();
-//  lcd.setCursor(0, 0);
-//
-//  lcd.print("Roll id:");
-//  lcd.setCursor(0, 1);
-//  getInputString('#', text);
-//  sscanf(text, "%d", &roll_id);
+  //  lcd.clear();
+  //  lcd.setCursor(0, 0);
+  //
+  //  lcd.print("Roll id:");
+  //  lcd.setCursor(0, 1);
+  //  getInputString('#', text);
+  //  sscanf(text, "%d", &roll_id);
 
   //************************************************
   create_new_roll(roll_id);
   //************************************************
 
-//  lcd.clear();
-//  lcd.setCursor(0, 0);
-//
-//  lcd.print("Tktlen(cm):");
-//  lcd.setCursor(0, 1);
-//  getInputString('#', text);
-//  sscanf(text, "%d", &tkt_len);
+  //  lcd.clear();
+  //  lcd.setCursor(0, 0);
+  //
+  //  lcd.print("Tktlen(cm):");
+  //  lcd.setCursor(0, 1);
+  //  getInputString('#', text);
+  //  sscanf(text, "%d", &tkt_len);
 
   //************************************************
   update_tktlen(roll_id, tkt_len);
@@ -166,7 +165,6 @@ void loop() {
   is_end = false;
   is_new_roll = false;
   is_on_track = false;
-  status_running = false;
 
   // Variables to submit
   damage_length = 0;
@@ -249,7 +247,19 @@ void loop() {
           break;
         }
       }
+    } else if (customKey == '*') {
+      //Idle mode
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Idle");
+      lcd.setCursor(0,1);
+      lcd.print("Continue ?#");
+      waitForInput('#');
+      lcd.clear();
+      lcd.setCursor(0, 0);
     }
+
+    // END - Check user input
 
     if (is_used) {
       rolls++;
@@ -299,23 +309,29 @@ void loop() {
 
 
     if (is_new_roll) {
-//      lcd.clear();
-//      lcd.setCursor(0, 0);
-//
-//      lcd.print("Roll id:");
-//      lcd.setCursor(0, 1);
-//      getInputString('#', text);
-//      sscanf(text, "%d", &roll_id);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+
+      lcd.print("Start new roll?");
+      waitForInput('#');
+
+      //      lcd.clear();
+      //      lcd.setCursor(0, 0);
+      //
+      //      lcd.print("Roll id:");
+      //      lcd.setCursor(0, 1);
+      //      getInputString('#', text);
+      //      sscanf(text, "%d", &roll_id);
 
       roll_id++;
 
-//      lcd.clear();
-//      lcd.setCursor(0, 0);
-//
-//      lcd.print("Tktlen(cm):");
-//      lcd.setCursor(0, 1);
-//      getInputString('#', text);
-//      sscanf(text, "%d", &tkt_len);
+      //      lcd.clear();
+      //      lcd.setCursor(0, 0);
+      //
+      //      lcd.print("Tktlen(cm):");
+      //      lcd.setCursor(0, 1);
+      //      getInputString('#', text);
+      //      sscanf(text, "%d", &tkt_len);
 
       is_new_roll = false;
 
@@ -327,6 +343,8 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
     }
+
+
 
     if (plies >= number_of_plies) {
       lcd.clear();
@@ -360,13 +378,10 @@ void loop() {
       }
       // Distance
       if (now != last && dir == 1) { // Rotating
-        if (!status_running) {
-          status_running = true;
-
-        }
+        
         count++;
         distance += pi * R / N;
-        if (distance >= layer_length-layer_length*tolerance/100) {
+        if (distance >= layer_length - layer_length * tolerance / 100) {
           plies++;
           distance = 0;
         }
