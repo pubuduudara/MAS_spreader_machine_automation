@@ -18,10 +18,6 @@ firebase.initializeApp(firebaseConfig);
 var rollidRef = firebase.database().ref('MAS/1');
 
 
-
-
-
-
 // rollidRef.on('value', hasSubNodes);
 // rollidRef.on('value', no_of_rolls);
 // const no_of_rolls = (data) => {
@@ -41,13 +37,6 @@ var rollidRef = firebase.database().ref('MAS/1');
 //                               };
 
 
-
-
-
-
-
-
-
 // // TEST
 
 // const del = () => {
@@ -61,14 +50,6 @@ var rollidRef = firebase.database().ref('MAS/1');
 // console.log(del());
 
 // // TEST
-
-
-
-
-
-
-
-
 
 
 // //////////////////////////////////////////
@@ -111,8 +92,8 @@ console.log("has nodes = "+hasSubNodes(data))
     var plies = mainNodes[k].plies;
     if(plies == null) plies = 0;
 
-    var update_total_used_len = mainNodes[k].update_total_used_length;
-    if(update_total_used_len == null) update_total_used_len = 0.00;
+    var used_len = mainNodes[k].used_length;
+    if(used_len == null) used_len = 0.00;
 
     var comment = mainNodes[k].comment;
     if(comment == null) comment = 0.00;
@@ -125,57 +106,11 @@ console.log("has nodes = "+hasSubNodes(data))
     document.getElementById("pliesVal").innerHTML = plies;
     document.getElementById("damageVal").innerHTML = dam_len;
     document.getElementById("overlapVal").innerHTML = overlapped_len;
-    document.getElementById("usedVal").innerHTML = update_total_used_len;
+    document.getElementById("usedVal").innerHTML = used_len;
     document.getElementById("endlenVal").innerHTML = end_len;
   }
 }
 
-
-
-
-
-
-
-
-
-
-// rollidRef.on('value', gotData1);
-// function gotData1(data) {
-//   var mainNodes = data.val();
-//   var keys = Object.keys(mainNodes);
-//   var values = Object.values(mainNodes);
-
-//   for(var i=0;i<keys.length-9; i++){
-//     var k = keys[i];
-//     var v = values[i];
-
-//     var dam_len = mainNodes[k].damage_length;
-//     if(dam_len == null) dam_len = 0.00;
-    
-//     var overlapped_len = mainNodes[k].overlap_length;
-//     if(overlapped_len == null) overlapped_len = 0.00;
-  
-//     var plies = mainNodes[k].plies;
-//     if(plies == null) plies = 0;
-
-//     var update_total_used_len = mainNodes[k].update_total_used_length;
-//     if(update_total_used_len == null) update_total_used_len = 0.00;
-
-//     var comment = mainNodes[k].comment;
-//     if(comment == null) comment = 0.00;
-
-//     var end_len = mainNodes[k].end_length;
-//     if(end_len == null) end_len = 0.00;
-
-//     document.getElementById("rollId").innerHTML = k;
-//     document.getElementById("commentVal").innerHTML = comment;
-//     document.getElementById("pliesVal").innerHTML = plies;
-//     document.getElementById("damageVal").innerHTML = dam_len;
-//     document.getElementById("overlapVal").innerHTML = overlapped_len;
-//     document.getElementById("usedVal").innerHTML = update_total_used_len;
-//     document.getElementById("endlenVal").innerHTML = end_len;
-//   }
-// }
 // The following are the common parameters
 // ///////////////////////////////////////////////////////
 

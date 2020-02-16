@@ -10,6 +10,11 @@ body{
   padding:1em;
 }
 
+h4 span{
+  color: darkred; 
+  padding-left: 30px;
+}
+
 .container{
   max-width:1170px;
   margin-left:auto;
@@ -131,18 +136,12 @@ h3{
   display:none;
 }
 
-/* LARGE SCREENS */
-@media(min-width:700px){
-  .wrapper{
-    display: grid;
-    grid-template-columns: 1fr 2fr;
+/* TINY SCREENS */
+@media screen and (max-width:700px){
+
+  .nav-wrapper{
+    display: flex;
+    /* grid-template-columns: 1fr 2fr; */
   }
 
-  .wrapper > *{
-    padding:2em;
-  }
-
-  .company-info h3, .company-info ul, .brand{
-    text-align: left;
-  }
 }
