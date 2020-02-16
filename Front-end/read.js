@@ -16,17 +16,70 @@ firebase.initializeApp(firebaseConfig);
 // Retreaving data from firebase
 /////////////////////////////////////////////////
 var rollidRef = firebase.database().ref('MAS/1');
-var no_of_rolls = 0;
+
+
+
+
+
+
+// rollidRef.on('value', hasSubNodes);
+// rollidRef.on('value', no_of_rolls);
+// const no_of_rolls = (data) => {
+//                                 var mainNodes = data.val();
+//                                 var keys = Object.keys(mainNodes);
+//                                 var values = Object.values(mainNodes);
+
+//                                 var n = 0;
+//                                 for(var i=0;i<keys.length;i++){
+//                                   if(values[i] != "[object Object]"){
+//                                     n++;
+//                                   }
+//                                 }
+//                                 console.log("n = "+ n); 
+//                                 // no_of_rolls =  n;
+//                                 {return n}
+//                               };
+
+
+
+
+
+
+
+
+
+// // TEST
+
+// const del = () => {
+//   var n = 0;
+//   for(var i=0;i<5;i++){
+//     n++;
+//   }
+//   {return n}
+// }
+
+// console.log(del());
+
+// // TEST
+
+
+
+
+
+
+
+
+
 
 // //////////////////////////////////////////
-rollidRef.on('value', gotData1, hasSubNodes);
 
-rollidRef.on('value', hasSubNodes);
+
+rollidRef.on('value', (hasSubNodes, gotData1));
+
 function hasSubNodes(data){
   var mainNodes = data.val();
   var keys = Object.keys(mainNodes);
   var values = Object.values(mainNodes);
-  console.log("object values = " + values[1]);
 
   var n = 0;
   for(var i=0;i<keys.length;i++){
@@ -34,25 +87,18 @@ function hasSubNodes(data){
       n++;
     }
   }
-console.log("n = "+ n); 
-  no_of_rolls =  n;
+ 
+  return n;
 }
 
-console.log("no_of_rolls = "+ no_of_rolls)
-
-// TRY TO FIGURE OUT THE NECCESARY CODE RIGHT HERE6
-
-
-// /////////////////////////////////////////
-
-
-rollidRef.on('value', gotData1);
 function gotData1(data) {
   var mainNodes = data.val();
   var keys = Object.keys(mainNodes);
   var values = Object.values(mainNodes);
 
-  for(var i=0;i<keys.length-9; i++){
+console.log("has nodes = "+hasSubNodes(data))
+
+  for(var i=0;i<keys.length-hasSubNodes(data); i++){
     var k = keys[i];
     var v = values[i];
 
@@ -73,14 +119,6 @@ function gotData1(data) {
 
     var end_len = mainNodes[k].end_length;
     if(end_len == null) end_len = 0.00;
-    
-    // var dam_len = mainNodes[k].damage_length;
-    // var overlapped_len = mainNodes[k].overlap_length;
-    // var plies = mainNodes[k].plies;
-    // var tktlen = mainNodes[k].tktlen;
-    // var update_total_used_len = mainNodes[k].update_total_used_length;
-    // var comment = mainNodes[k].comment;
-    // var end_len = mainNodes[k].end_length;
 
     document.getElementById("rollId").innerHTML = k;
     document.getElementById("commentVal").innerHTML = comment;
@@ -88,10 +126,56 @@ function gotData1(data) {
     document.getElementById("damageVal").innerHTML = dam_len;
     document.getElementById("overlapVal").innerHTML = overlapped_len;
     document.getElementById("usedVal").innerHTML = update_total_used_len;
-    // document.getElementById("tktlenVal").innerHTML = tktlen_;
     document.getElementById("endlenVal").innerHTML = end_len;
   }
 }
+
+
+
+
+
+
+
+
+
+
+// rollidRef.on('value', gotData1);
+// function gotData1(data) {
+//   var mainNodes = data.val();
+//   var keys = Object.keys(mainNodes);
+//   var values = Object.values(mainNodes);
+
+//   for(var i=0;i<keys.length-9; i++){
+//     var k = keys[i];
+//     var v = values[i];
+
+//     var dam_len = mainNodes[k].damage_length;
+//     if(dam_len == null) dam_len = 0.00;
+    
+//     var overlapped_len = mainNodes[k].overlap_length;
+//     if(overlapped_len == null) overlapped_len = 0.00;
+  
+//     var plies = mainNodes[k].plies;
+//     if(plies == null) plies = 0;
+
+//     var update_total_used_len = mainNodes[k].update_total_used_length;
+//     if(update_total_used_len == null) update_total_used_len = 0.00;
+
+//     var comment = mainNodes[k].comment;
+//     if(comment == null) comment = 0.00;
+
+//     var end_len = mainNodes[k].end_length;
+//     if(end_len == null) end_len = 0.00;
+
+//     document.getElementById("rollId").innerHTML = k;
+//     document.getElementById("commentVal").innerHTML = comment;
+//     document.getElementById("pliesVal").innerHTML = plies;
+//     document.getElementById("damageVal").innerHTML = dam_len;
+//     document.getElementById("overlapVal").innerHTML = overlapped_len;
+//     document.getElementById("usedVal").innerHTML = update_total_used_len;
+//     document.getElementById("endlenVal").innerHTML = end_len;
+//   }
+// }
 // The following are the common parameters
 // ///////////////////////////////////////////////////////
 
