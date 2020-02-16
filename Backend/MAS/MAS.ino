@@ -263,7 +263,7 @@ void loop() {
 
     if (is_used) {
       rolls++;
-      used_length = distance;
+      used_length += distance;
 
       float comnt = tkt_len - (plies * layer_length) + overlap_length + damage_length + used_length + 0;
 
@@ -299,7 +299,7 @@ void loop() {
       update_end_length(roll_id, end_length);
       update_comment(roll_id, comnt);
       //****************************************************
-
+      
       is_new_roll = true;
       is_end = false;
       plies = 0;
@@ -340,6 +340,9 @@ void loop() {
       update_tktlen(roll_id, tkt_len);
       //************************************************
 
+      overlap_length = 0;
+      damage_length = 0;
+      
       lcd.clear();
       lcd.setCursor(0, 0);
     }
@@ -445,7 +448,7 @@ void loop() {
       }
 
       //*********************************************************
-      overlap_length = distance + dis_with_overlap - layer_length;
+      overlap_length += distance + dis_with_overlap - layer_length;
       update_overlap_length(roll_id, overlap_length);
       //*********************************************************
 
