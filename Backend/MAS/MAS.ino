@@ -366,7 +366,7 @@ void loop() {
         }
         count++;
         distance += pi * R / N;
-        if (distance >= layer_length-layer_length*tolerance) {
+        if (distance >= layer_length-layer_length*tolerance/100) {
           plies++;
           distance = 0;
         }
