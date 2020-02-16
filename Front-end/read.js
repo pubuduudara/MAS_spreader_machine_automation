@@ -15,8 +15,36 @@ firebase.initializeApp(firebaseConfig);
 
 // Retreaving data from firebase
 /////////////////////////////////////////////////
-// document.getElementById("batchVal").innerHTML = 1;
 var rollidRef = firebase.database().ref('MAS/1');
+var no_of_rolls = 0;
+
+// //////////////////////////////////////////
+rollidRef.on('value', gotData1, hasSubNodes);
+
+rollidRef.on('value', hasSubNodes);
+function hasSubNodes(data){
+  var mainNodes = data.val();
+  var keys = Object.keys(mainNodes);
+  var values = Object.values(mainNodes);
+  console.log("object values = " + values[1]);
+
+  var n = 0;
+  for(var i=0;i<keys.length;i++){
+    if(values[i] != "[object Object]"){
+      n++;
+    }
+  }
+console.log("n = "+ n); 
+  no_of_rolls =  n;
+}
+
+console.log("no_of_rolls = "+ no_of_rolls)
+
+// TRY TO FIGURE OUT THE NECCESARY CODE RIGHT HERE6
+
+
+// /////////////////////////////////////////
+
 
 rollidRef.on('value', gotData1);
 function gotData1(data) {
@@ -24,7 +52,7 @@ function gotData1(data) {
   var keys = Object.keys(mainNodes);
   var values = Object.values(mainNodes);
 
-  for(var i=0;i<keys.length-7; i++){
+  for(var i=0;i<keys.length-9; i++){
     var k = keys[i];
     var v = values[i];
 
@@ -140,11 +168,16 @@ function gotData8(data) {
 }
 
 // Input roll number
-user_input_rollsRef.on('value', gotData9);
-function gotData9(data) {
-  var inputRolls = data.val();
-  document.getElementById("user_input_rollsId").innerHTML = inputRolls;
-}
+// user_input_rollsRef.on('value', gotData9);
+// function gotData9(data) {
+//   var inputRolls = data.val();
+
+//   console.log("input rolls = "+inputRolls);
+//   // if(inputRolls !== null){
+//     document.getElementById("user_input_rollsId").innerHTML = inputRolls;
+//   // }
+//   // document.getElementById("user_input_rollsId").innerHTML = inputRolls;
+// }
 
 // input Plies
 user_input_pliesRef.on('value', gotData10);

@@ -17,6 +17,18 @@ body{
   padding:1em;
 }
 
+#logo-container{
+  padding-left: 30px;
+}
+
+#logo-container span{
+  color: darkred;
+}
+
+#main_topic {
+  color: darkred;
+}
+
 ul{
   list-style: none;
   padding:0;
