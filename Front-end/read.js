@@ -18,43 +18,6 @@ firebase.initializeApp(firebaseConfig);
 var rollidRef = firebase.database().ref('MAS/1');
 
 
-// rollidRef.on('value', hasSubNodes);
-// rollidRef.on('value', no_of_rolls);
-// const no_of_rolls = (data) => {
-//                                 var mainNodes = data.val();
-//                                 var keys = Object.keys(mainNodes);
-//                                 var values = Object.values(mainNodes);
-
-//                                 var n = 0;
-//                                 for(var i=0;i<keys.length;i++){
-//                                   if(values[i] != "[object Object]"){
-//                                     n++;
-//                                   }
-//                                 }
-//                                 console.log("n = "+ n); 
-//                                 // no_of_rolls =  n;
-//                                 {return n}
-//                               };
-
-
-// // TEST
-
-// const del = () => {
-//   var n = 0;
-//   for(var i=0;i<5;i++){
-//     n++;
-//   }
-//   {return n}
-// }
-
-// console.log(del());
-
-// // TEST
-
-
-// //////////////////////////////////////////
-
-
 rollidRef.on('value', (hasSubNodes, gotData1));
 
 function hasSubNodes(data){
