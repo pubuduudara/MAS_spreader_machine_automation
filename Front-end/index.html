@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="./bower_components/materialize/dist/css/materialize.min.css"  media="screen,projection"/>
+
+      <link rel="stylesheet" href="frontStyle.css">
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+
+    <body>
+
+        <nav class="cyan lighten-1" role="navigation"> 
+            <div class="nav-wrapper container sizeit">
+              <img src="./img/logo3.png" alt="Mas logo">
+                <div class="container brand-logo">
+                  <span style="color: darkred; padding-left: 30px;">Spreader Machine Automation</span> Details
+                </div>
+             
+            </div>
+        </nav>
+ 
+          <!-- User Inputs -->
+<!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+
+    <h4 class="teal lighten-3" style="padding-left: 20px;">User inputs:</h4>
+
+        <div class="row common">
+          <span class="col s6">
+            <label><h5>Layer Length: </h5></label>
+            <div class="info" id="user_input_layer_lenId"></div>
+          </span>
+
+          <span class="col s6">
+            <label><h5>Plies: </h5></label>
+            <div class="info" id="user_input_pliesId"></div>
+          </span>
+
+          <!-- <span class="col s4">
+            <label><h5>Rolls: </h5></label>
+            <div class="info" id="user_input_rollsId"></div>
+          </span> -->
+        </div>
+
+<!-- /////////////////////////////////////////////////////////////////////// -->
+
+        <div class="teal lighten-3">
+          <h4 style="padding-left: 20px;">The Roll Parameters:  
+            <span style="float: right; padding-right: 20%; color: darkolivegreen;">The roll Id: 
+              <span id="rollId">
+              </span> 
+            </span>
+          </h4>
+        </div>
+
+        <!-- where the roll_ID parameters are displays -->
+
+        <div class="row common">
+          <span class="col s4">
+            <label><h5>Plies: </h5></label>
+            <div class="info" id="pliesVal"></div>
+          </span>
+
+          <span class="col s4">
+            <label><h5>Overlaps: </h5></label>
+            <div class="info" id="overlapVal"></div>
+          </span>
+
+          <span class="col s4">
+            <label><h5>Damaged: </h5></label>
+            <div class="info" id="damageVal"></div>
+          </span>
+         
+        </div>
+        
+        <div class="row common">
+
+          <span class="col s4">
+            <label><h5>Used: </h5></label>
+            <div class="info" id="usedVal"></div>
+          </span>
+
+          <span class="col s4">
+            <label><h5>Ends: </h5></label>
+            <div class="info" id="endlenVal"></div>
+          </span>
+
+          <span class="col s4">
+            <label><h5>Def/Ex: </h5></label>
+            <div class="info" id="commentVal"></div>
+          </span>
+
+        </div>
+
+        <h4 class="teal lighten-3"style="padding-left: 20px;">The Common Parameters:</h4>
+<!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- where the common parameters are displays -->
+    <!-- /////////////////////////////////////////// -->
+
+    <div class="row common">
+        <!-- <div class="col s3"> -->
+          <span class="col s6">
+            <label><h5>Plies Layed: </h5></label>
+            <div class="info" id="batch_total_pliesId"></div>
+          </span>
+          
+          <span class="col s6">
+            <label><h5>Ontrack status: </h5></label>
+            
+            <div id="ontrackId_true" style="display: none;">
+              <a class="button btn-large green pulse">
+                ON TRACK
+              </a>
+            </div>
+
+            <div id="ontrackId_false" style="display:block;">
+              <a class="button btn-large red">
+                OFF TRACK
+              </a>
+            </div>
+          </span>
+    </div>
+            
+<!-- /////////////////////////////////////////////////////////////// -->
+
+      <!--JavaScript at end of body for optimized loading-->
+      <script type="text/javascript" src="./bower_components/materialize/dist/js/materialize.min.js"></script>
+        
+      <!-- The core Firebase JS SDK is always required and must be listed first -->
+      <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+
+      <!-- TODO: Add SDKs for Firebase products that you want to use
+          https://firebase.google.com/docs/web/setup#available-libraries -->
+      <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-database.js"></script>
+
+        <!-- <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script> -->
+        <script src="read.js"></script>
+    </body>
+  </html>
+        
